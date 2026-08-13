@@ -1,0 +1,18 @@
+{
+  "name": "pramyan-hr-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pramyan HR Management Dashboard - Monorepo for Frontend & Backend",
+  "scripts": {
+    "dev": "./scripts/dev.sh",
+    "dev:terms": "./scripts/dev.sh --terms",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm --filter frontend build",
+    "seed": "pnpm --filter backend seed",
+    "start": "concurrently -n \"backend,frontend\" -c \"cyan,magenta\" \"pnpm --filter backend start\" \"pnpm --filter frontend start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

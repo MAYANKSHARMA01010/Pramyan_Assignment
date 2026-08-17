@@ -2,6 +2,7 @@
   "name": "pramyan-hr-dashboard",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.28.2",
   "description": "Pramyan HR Management Dashboard - Monorepo for Frontend & Backend",
   "scripts": {
     "dev": "./scripts/dev.sh",

@@ -1,16 +1,25 @@
 const mongoose = require('mongoose');
 
+let isConnected = false;
+let retryTimeout = null;
+
 const connectDB = async () => {
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    console.error('❌ MongoDB Connection Error: MONGO_URI environment variable is missing.');
+    console.error('💡 TIP: Set MONGO_URI in your environment or Render Dashboard -> Environment.');
+    return;
+  }
+
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI environment variable is not defined.');
-    }
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 10000,
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000,
     });
+    isConnected = true;
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
+    isConnected = false;
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
     if (error.message.includes('whitelist') || error.message.includes('Could not connect to any servers')) {
       console.error(
@@ -22,8 +31,30 @@ const connectDB = async () => {
         '💡 TIP: Check your database username and password in MongoDB Atlas -> Database Access!'
       );
     }
-    process.exit(1);
+
+    // Schedule auto-retry after 5 seconds without crashing the server process
+    if (!retryTimeout) {
+      retryTimeout = setTimeout(() => {
+        retryTimeout = null;
+        connectDB();
+      }, 5000);
+    }
   }
 };
 
-module.exports = connectDB;
+mongoose.connection.on('disconnected', () => {
+  isConnected = false;
+  console.warn('⚠️ MongoDB disconnected. Retrying in 5 seconds...');
+  if (!retryTimeout) {
+    retryTimeout = setTimeout(() => {
+      retryTimeout = null;
+      connectDB();
+    }, 5000);
+  }
+});
+
+mongoose.connection.on('connected', () => {
+  isConnected = true;
+});
+
+module.exports = { connectDB, isConnected: () => isConnected };

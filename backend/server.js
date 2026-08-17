@@ -5,10 +5,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const connectDB = require('./config/db');
+const { connectDB, isConnected } = require('./config/db');
 const errorHandler = require('./middleware/error.middleware');
 
-// Initialize database
+// Initialize database connection
 connectDB();
 
 const app = express();
@@ -84,8 +84,10 @@ app.get('/', (req, res) => {
 
 // Health Check
 app.get('/api/health', (req, res) => {
+  const dbStatus = isConnected();
   res.json({
-    status: 'healthy',
+    status: dbStatus ? 'healthy' : 'database_connecting',
+    databaseConnected: dbStatus,
     timestamp: new Date().toISOString(),
     service: 'Pramyan HR Management API',
     database: 'MongoDB Atlas',

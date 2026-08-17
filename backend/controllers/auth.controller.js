@@ -105,18 +105,19 @@ exports.login = async (req, res) => {
       ADMIN_USER
     );
 
-    // 3. Set Cookies with respective expiry times from ENV
+    // 3. Set Cookies with respective expiry times from ENV (supports local lax and hosted cross-domain none/secure)
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', accessToken, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: accessMs,
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: refreshMs,
     });
 
@@ -186,17 +187,18 @@ exports.refreshToken = async (req, res) => {
     );
 
     // 6. Set updated cookies
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', newAccessToken, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: accessMs,
     });
 
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: refreshMs,
     });
 

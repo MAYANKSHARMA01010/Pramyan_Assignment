@@ -29,8 +29,9 @@ export function AuthProvider({ children }) {
       const user = storedUser ? JSON.parse(storedUser) : null;
 
       if (storedToken && user) {
-        // Ensure cookie is synced for Next.js middleware
-        document.cookie = `accessToken=${storedToken}; path=/; max-age=900; SameSite=Lax`;
+        // Ensure cookie is synced for Next.js proxy middleware (HTTP & HTTPS safe)
+        const secureFlag = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `accessToken=${storedToken}; path=/; max-age=900; SameSite=Lax${secureFlag}`;
 
         dispatch({
           type: AUTH_ACTIONS.INIT_AUTH,
@@ -66,8 +67,9 @@ export function AuthProvider({ children }) {
       localStorage.setItem('hr_token', token);
       localStorage.setItem('hr_user', JSON.stringify(user));
 
-      document.cookie = `accessToken=${token}; path=/; max-age=900; SameSite=Lax`;
-      document.cookie = `hr_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+      const secureFlag = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `accessToken=${token}; path=/; max-age=900; SameSite=Lax${secureFlag}`;
+      document.cookie = `hr_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax${secureFlag}`;
 
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,

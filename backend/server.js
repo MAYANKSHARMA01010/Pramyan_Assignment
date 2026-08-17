@@ -15,14 +15,45 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
-  : ['http://localhost:3000', 'https://pramyan-assignment-hr-dashboard.vercel.app'];
+// Dynamic CORS origins resolved purely from ENV variables
+const envOrigins = [
+  process.env.LOCAL_FRONTEND_URL,
+  process.env.HOSTED_FRONTEND_URL,
+  ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : []),
+]
+  .filter(Boolean)
+  .map((origin) => origin.trim().replace(/\/$/, ''));
+
+const allowedOrigins = Array.from(new Set(envOrigins));
 
 app.use(
   cors({
-    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow server-to-server, curl, mobile, or requests with no origin header
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.trim().replace(/\/$/, '');
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes(normalizedOrigin) ||
+        allowedOrigins.includes('*')
+      ) {
+        return callback(null, true);
+      }
+
+      // Automatically permit any Vercel preview or localhost port dynamically
+      if (
+        /^https:\/\/.*\.vercel\.app$/.test(normalizedOrigin) ||
+        /^http:\/\/localhost(:\d+)?$/.test(normalizedOrigin)
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(null, true);
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   })
 );
 

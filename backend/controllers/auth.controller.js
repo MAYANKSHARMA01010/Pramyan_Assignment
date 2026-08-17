@@ -111,6 +111,7 @@ exports.login = async (req, res) => {
       httpOnly: false,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
       maxAge: accessMs,
     });
 
@@ -118,6 +119,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
       maxAge: refreshMs,
     });
 
@@ -192,6 +194,7 @@ exports.refreshToken = async (req, res) => {
       httpOnly: false,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
       maxAge: accessMs,
     });
 
@@ -199,6 +202,7 @@ exports.refreshToken = async (req, res) => {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
       maxAge: refreshMs,
     });
 
@@ -221,9 +225,16 @@ exports.logout = async (req, res) => {
       await RefreshToken.deleteOne({ token });
     }
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-    res.clearCookie('hr_token');
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearOptions = {
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
+    };
+
+    res.clearCookie('accessToken', clearOptions);
+    res.clearCookie('refreshToken', clearOptions);
+    res.clearCookie('hr_token', clearOptions);
 
     return res.json({ message: 'Successfully signed out and revoked active session' });
   } catch (error) {

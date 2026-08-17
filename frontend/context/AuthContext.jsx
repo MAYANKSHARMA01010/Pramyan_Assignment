@@ -61,9 +61,13 @@ export function AuthProvider({ children }) {
     try {
       const { data } = await api.post('/auth/login', { email, password });
       const token = data.accessToken || data.token;
+      const refreshToken = data.refreshToken;
       const user = data.user;
 
       localStorage.setItem('accessToken', token);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+      }
       localStorage.setItem('hr_token', token);
       localStorage.setItem('hr_user', JSON.stringify(user));
 
@@ -93,16 +97,20 @@ export function AuthProvider({ children }) {
   // Logout handler
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      const storedRefreshToken =
+        typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+      await api.post('/auth/logout', { refreshToken: storedRefreshToken });
     } catch {}
 
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('hr_token');
     localStorage.removeItem('hr_user');
 
-    document.cookie = 'accessToken=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'hr_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'refreshToken=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    const secureFlag = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `accessToken=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+    document.cookie = `hr_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
+    document.cookie = `refreshToken=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${secureFlag}`;
 
     dispatch({ type: AUTH_ACTIONS.LOGOUT });
     router.replace('/login');

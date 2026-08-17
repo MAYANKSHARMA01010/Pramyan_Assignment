@@ -10,6 +10,9 @@ connectDB();
 
 const app = express();
 
+// Trust reverse proxies (Render, Vercel, Nginx, Cloudflare)
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,36 +29,56 @@ const envOrigins = [
 
 const allowedOrigins = Array.from(new Set(envOrigins));
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow server-to-server, curl, mobile, or requests with no origin header
-      if (!origin) return callback(null, true);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, server-to-server, mobile apps)
+    if (!origin) return callback(null, true);
 
-      const normalizedOrigin = origin.trim().replace(/\/$/, '');
-      if (
-        allowedOrigins.length === 0 ||
-        allowedOrigins.includes(normalizedOrigin) ||
-        allowedOrigins.includes('*')
-      ) {
-        return callback(null, true);
-      }
-
-      // Automatically permit any Vercel preview or localhost port dynamically
-      if (
-        /^https:\/\/.*\.vercel\.app$/.test(normalizedOrigin) ||
-        /^http:\/\/localhost(:\d+)?$/.test(normalizedOrigin)
-      ) {
-        return callback(null, true);
-      }
-
+    const normalizedOrigin = origin.trim().replace(/\/$/, '');
+    if (
+      allowedOrigins.length === 0 ||
+      allowedOrigins.includes(normalizedOrigin) ||
+      allowedOrigins.includes('*')
+    ) {
       return callback(null, true);
+    }
+
+    // Automatically permit any Vercel deployment and localhost port dynamically
+    if (
+      /^https:\/\/.*\.vercel\.app$/.test(normalizedOrigin) ||
+      /^http:\/\/localhost(:\d+)?$/.test(normalizedOrigin)
+    ) {
+      return callback(null, true);
+    }
+
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+// Root Welcome Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Pramyan HR Management REST API',
+    status: 'online',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      employees: '/api/employees',
+      attendance: '/api/attendance',
+      dashboard: '/api/dashboard',
     },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  })
-);
+    documentation: 'https://github.com/MAYANKSHARMA01010/Pramyan_Assignment',
+  });
+});
 
 // Health Check
 app.get('/api/health', (req, res) => {

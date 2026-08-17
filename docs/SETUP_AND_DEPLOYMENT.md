@@ -2,11 +2,19 @@
 
 ## 1. Environment Configuration
 
-### Root / Backend `.env` (`backend/.env`)
+### Backend `.env` (`backend/.env`)
 ```env
 PORT=5001
-MONGO_URI=mongodb+srv://sharmamayank01010_db_user:8DzSQ9IMIMyVJzNY@pramyanassignment.igzfs1s.mongodb.net/hr_dashboard?retryWrites=true&w=majority&appName=PramyanAssignment
-CORS_ORIGIN=http://localhost:3000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/hr_dashboard?retryWrites=true&w=majority
+
+# Application URLs (Local & Hosted)
+LOCAL_FRONTEND_URL=http://localhost:3000
+HOSTED_FRONTEND_URL=https://pramyan-assignment-hr-dashboard.vercel.app
+LOCAL_BACKEND_URL=http://localhost:5001
+HOSTED_BACKEND_URL=https://pramyan-assignment.onrender.com
+
+# CORS Configuration (comma-separated origins allowed)
+CORS_ORIGIN=http://localhost:3000,https://pramyan-assignment-hr-dashboard.vercel.app
 
 # Dual Token Authentication (Configurable Secrets & Expirations via ENV)
 JWT_ACCESS_SECRET=pramyan_access_token_secret_auth_2026_x89a1b2c3
@@ -18,7 +26,16 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 ### Frontend `.env` (`frontend/.env`)
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5001/api
+PORT=3000
+
+# Application URLs (Local & Hosted)
+NEXT_PUBLIC_LOCAL_FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_HOSTED_FRONTEND_URL=https://pramyan-assignment-hr-dashboard.vercel.app
+NEXT_PUBLIC_LOCAL_BACKEND_URL=http://localhost:5001
+NEXT_PUBLIC_HOSTED_BACKEND_URL=https://pramyan-assignment.onrender.com
+
+# Active Backend API URL for Server-Side and Client Proxies
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5001
 ```
 
 ---

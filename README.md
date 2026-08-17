@@ -10,17 +10,24 @@ Designed with the **Stitch Executive Slate** design system (inspired by Linear, 
 
 ---
 
+## 🌐 Live Deployments & Local URLs
+
+| Environment | Frontend URL | Backend REST API |
+|---|---|---|
+| **Production / Hosted** | [https://pramyan-assignment-hr-dashboard.vercel.app](https://pramyan-assignment-hr-dashboard.vercel.app) | [https://pramyan-assignment.onrender.com](https://pramyan-assignment.onrender.com) |
+| **Local Development** | [http://localhost:3000](http://localhost:3000) | [http://localhost:5001](http://localhost:5001) |
+
+- **Hosted Database**: MongoDB Atlas (`pramyanassignment.igzfs1s.mongodb.net`)
+
+---
+
 ## ⚡ Master Runner
 
-You can launch the entire project with a single command:
+You can launch the entire project locally with a single command:
 
 ```bash
 ./scripts/dev.sh
 ```
-
-- **Frontend Application**: [http://localhost:3000](http://localhost:3000)
-- **Backend REST API**: [http://localhost:5001](http://localhost:5001)
-- **Hosted Cloud Database**: MongoDB Atlas (`pramyanassignment.igzfs1s.mongodb.net`)
 
 ---
 

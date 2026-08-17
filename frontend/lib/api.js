@@ -1,17 +1,15 @@
 import axios from 'axios';
 
 export const getBaseURL = () => {
-  if (typeof window !== 'undefined') {
-    const isLocalhost =
-      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (!isLocalhost) {
-      return (
-        process.env.NEXT_PUBLIC_HOSTED_BACKEND_URL ||
-        process.env.NEXT_PUBLIC_BACKEND_URL
-      ).replace(/\/$/, '') + '/api';
-    }
-  }
-  return '/api';
+  const isProduction =
+    process.env.NEXT_PUBLIC_NODE_ENV === 'production' ||
+    process.env.NODE_ENV === 'production';
+
+  const backendUrl = isProduction
+    ? (process.env.NEXT_PUBLIC_HOSTED_BACKEND_URL || 'https://pramyan-assignment.onrender.com')
+    : (process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL || 'http://localhost:5001');
+
+  return `${backendUrl.replace(/\/$/, '')}/api`;
 };
 
 const api = axios.create({

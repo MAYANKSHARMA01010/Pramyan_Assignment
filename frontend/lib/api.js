@@ -6,8 +6,8 @@ export const getBaseURL = () => {
     process.env.NODE_ENV === 'production';
 
   const backendUrl = isProduction
-    ? (process.env.NEXT_PUBLIC_HOSTED_BACKEND_URL || 'https://pramyan-assignment.onrender.com')
-    : (process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL || 'http://localhost:5001');
+    ? process.env.NEXT_PUBLIC_HOSTED_BACKEND_URL
+    : process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL;
 
   return `${backendUrl.replace(/\/$/, '')}/api`;
 };

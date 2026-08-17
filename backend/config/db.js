@@ -4,12 +4,15 @@ let isConnected = false;
 let retryTimeout = null;
 
 const connectDB = async () => {
-  const uri = process.env.MONGO_URI;
-  if (!uri) {
+  const rawUri = process.env.MONGO_URI;
+  if (!rawUri) {
     console.error('❌ MongoDB Connection Error: MONGO_URI environment variable is missing.');
     console.error('💡 TIP: Set MONGO_URI in your environment or Render Dashboard -> Environment.');
     return;
   }
+
+  // Strip leading/trailing quotes or whitespace if entered in Render dashboard
+  const uri = rawUri.trim().replace(/^["']|["']$/g, '');
 
   try {
     const conn = await mongoose.connect(uri, {

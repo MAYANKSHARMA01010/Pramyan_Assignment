@@ -5,6 +5,8 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');
 const Employee = require('./models/Employee');
 const Attendance = require('./models/Attendance');
+const User = require('./models/User');
+const RefreshToken = require('./models/RefreshToken');
 
 const employees = [
   // Engineering (7)
@@ -285,14 +287,29 @@ const employees = [
 ];
 
 async function seed() {
-  await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/hr_dashboard');
-  console.log('Connected to MongoDB Atlas for 1-month comprehensive seeding...');
+  const rawUri = process.env.MONGO_URI || 'mongodb://localhost:27017/hr_dashboard';
+  const uri = rawUri.trim().replace(/^["']|["']$/g, '');
+  await mongoose.connect(uri);
+  console.log('🌱 Connected to MongoDB Atlas for database reset & seeding...');
 
+  // Reset collections
   await Employee.deleteMany({});
   await Attendance.deleteMany({});
+  await RefreshToken.deleteMany({});
+  await User.deleteMany({});
+  console.log('🧹 Cleaned existing employees, attendance logs, tokens, and users.');
+
+  // Seed default admin user
+  await User.create({
+    name: 'HR Admin',
+    email: 'admin@pramyan.com',
+    password: 'Admin@123',
+    role: 'Admin',
+  });
+  console.log('👤 Seeded default HR Admin account (admin@pramyan.com / Admin@123)');
 
   const createdEmployees = await Employee.insertMany(employees);
-  console.log(`✅ Seeded ${createdEmployees.length} employees across 8 company departments`);
+  console.log(`👥 Seeded ${createdEmployees.length} employees across 8 company departments`);
 
   // Generate 30 Days (1 Full Month) of Realistic Variable Attendance History
   const activeEmployees = createdEmployees.filter((e) => e.status === 'Active');

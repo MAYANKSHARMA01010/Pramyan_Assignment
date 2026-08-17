@@ -1,16 +1,31 @@
 import axios from 'axios';
 
+export const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost) {
+      return (
+        process.env.NEXT_PUBLIC_HOSTED_BACKEND_URL ||
+        process.env.NEXT_PUBLIC_BACKEND_URL
+      ).replace(/\/$/, '') + '/api';
+    }
+  }
+  return '/api';
+};
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Transmits HTTP-only cookies (refreshToken, accessToken)
 });
 
-// Request Interceptor: Attach Access Token from localStorage or cookie
+// Request Interceptor: Attach Access Token and ensure dynamic baseURL
 api.interceptors.request.use(
   (config) => {
+    config.baseURL = getBaseURL();
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken') || localStorage.getItem('hr_token');
       if (token) {
@@ -69,7 +84,7 @@ api.interceptors.response.use(
           typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
 
         const { data } = await axios.post(
-          '/api/auth/refresh',
+          `${getBaseURL()}/auth/refresh`,
           { refreshToken: storedRefreshToken },
           { withCredentials: true }
         );

@@ -59,7 +59,7 @@ for PORT in 3000 5001; do
 done
 
 # 2. Check and install pnpm workspace dependencies
-echo "📦 [3/4] Verifying pnpm workspace dependencies..."
+echo "📦 [3/5] Verifying pnpm workspace dependencies..."
 cd "$ROOT_DIR"
 if ! command -v pnpm &> /dev/null; then
   echo "  Installing pnpm globally..."
@@ -67,12 +67,16 @@ if ! command -v pnpm &> /dev/null; then
 fi
 pnpm install --silent
 
-# 3. Optional / Auto database seeding on hosted MongoDB Atlas
+# 3. Build the application bundle before starting dev servers
+echo "🔨 [4/5] Building project bundle (pnpm run build)..."
+pnpm run build
+
+# 4. Optional / Auto database seeding on hosted MongoDB Atlas
 if [ "$FORCE_SEED" = true ]; then
-  echo "🌱 [4/4] Force seeding hosted MongoDB Atlas database..."
+  echo "🌱 [5/5] Force seeding hosted MongoDB Atlas database..."
   pnpm seed
 else
-  echo "🌱 [4/4] Checking hosted MongoDB Atlas database status..."
+  echo "🌱 [5/5] Checking hosted MongoDB Atlas database status..."
   node -e "
     const mongoose = require('mongoose');
     require('dotenv').config({ path: '$ROOT_DIR/backend/.env' });

@@ -1,4 +1,7 @@
+const path = require('path');
 require('dotenv').config();
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -61,7 +64,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 // Root Welcome Endpoint
 app.get('/', (req, res) => {

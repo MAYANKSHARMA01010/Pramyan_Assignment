@@ -44,6 +44,7 @@ export default function EmployeesPage() {
     setFilter,
     resetFilters,
     fetchEmployees,
+    saveEmployee,
     deleteEmployee,
   } = useDashboard();
 
@@ -392,7 +393,13 @@ export default function EmployeesPage() {
       {modalOpen && (
         <EmployeeModal
           isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setEditEmployee(null);
+          }}
+          onSave={async (data) => {
+            await saveEmployee(data, editEmployee?._id);
+          }}
           employee={editEmployee}
         />
       )}

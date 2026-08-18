@@ -285,7 +285,23 @@ export default function AttendancePage() {
 
   const activeEmployees = employees.filter((e) => e.status === 'Active');
 
+  const selectedDateObj = useMemo(() => {
+    return new Date(selectedDate + 'T00:00:00');
+  }, [selectedDate]);
+
+  const dayOfWeek = selectedDateObj.getDay();
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  const dayName = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long' });
+  const shortDayName = selectedDateObj.toLocaleDateString('en-US', { weekday: 'short' });
+  const formattedFullDate = selectedDateObj.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   const handleMark = async (empId, status, empName) => {
+    if (isWeekend) return;
     setSaving((s) => ({ ...s, [empId]: true }));
     try {
       await markAttendance(empId, status, empName);
@@ -295,9 +311,12 @@ export default function AttendancePage() {
   };
 
   const shiftDate = (days) => {
-    const d = new Date(selectedDate);
+    const d = new Date(selectedDate + 'T00:00:00');
     d.setDate(d.getDate() + days);
-    setDate(d.toISOString().split('T')[0]);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    setDate(`${year}-${month}-${day}`);
   };
 
   // Metrics computed from current attendanceMap
@@ -328,19 +347,25 @@ export default function AttendancePage() {
       {/* Date Navigation & Controls Bar */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Daily Attendance Tracking</h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono-code font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              {presentCount} Present
-            </span>
+            {isWeekend ? (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono-code font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                🏖️ Weekend ({shortDayName}) - Non-Working
+              </span>
+            ) : (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono-code font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {presentCount} Present
+              </span>
+            )}
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Live roll call for <span className="text-slate-700 font-semibold font-mono-code">{selectedDate}</span> across {totalEmployees} active team members
+            Roll call for <span className="text-slate-900 font-semibold font-mono-code">{formattedFullDate}</span> across {totalEmployees} active team members
           </p>
         </div>
 
         {/* Date Selector Strip */}
-        <div className="flex items-center rounded-xl bg-white border border-slate-200 p-1.5 shadow-xs">
+        <div className="flex items-center rounded-xl bg-white border border-slate-200 p-1.5 shadow-xs flex-wrap gap-1">
           <button
             onClick={() => shiftDate(-1)}
             className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
@@ -349,8 +374,16 @@ export default function AttendancePage() {
             <ChevronLeft size={16} />
           </button>
 
-          <div className="flex items-center gap-2 px-3">
-            <Calendar size={14} className="text-slate-600" />
+          <div className="flex items-center gap-2 px-2">
+            <span
+              className={`px-2 py-0.5 rounded text-[11px] font-mono-code font-bold ${
+                isWeekend
+                  ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                  : 'bg-slate-100 text-slate-700 border border-slate-200'
+              }`}
+            >
+              {shortDayName}
+            </span>
             <input
               id="attendance-date"
               type="date"
@@ -371,13 +404,23 @@ export default function AttendancePage() {
           {selectedDate !== todayStr && (
             <button
               onClick={() => setDate(todayStr)}
-              className="ml-2 px-2.5 py-1 rounded-lg text-[11px] font-mono-code font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors flex items-center gap-1"
+              className="ml-1 px-2.5 py-1 rounded-lg text-[11px] font-mono-code font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-colors flex items-center gap-1"
             >
               <RotateCcw size={11} /> Today
             </button>
           )}
         </div>
       </div>
+
+      {/* Weekend Banner Notification */}
+      {isWeekend && (
+        <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+          <Calendar size={16} className="text-amber-600 shrink-0" />
+          <span>
+            <strong>{dayName} ({selectedDate}) is a weekend (non-working day).</strong> Attendance is only recorded on working days (Monday – Friday). Quick toggles are disabled.
+          </span>
+        </div>
+      )}
 
       {/* Summary Metrics Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -432,7 +475,7 @@ export default function AttendancePage() {
           <div className="flex items-center gap-2">
             <CalendarDays size={16} className="text-slate-600" />
             <h3 className="text-sm font-bold text-slate-900">
-              Staff Roll Call • <span className="font-mono-code text-slate-700">{selectedDate}</span>
+              Staff Roll Call • <span className="font-mono-code text-slate-700">{formattedFullDate}</span>
             </h3>
           </div>
           <span className="text-xs text-slate-500 font-mono-code font-medium">
@@ -502,18 +545,30 @@ export default function AttendancePage() {
 
                       {/* Segmented Quick Status Buttons */}
                       <td className="px-4 py-3.5 text-center">
-                        <div className="inline-flex rounded-lg bg-slate-100 border border-slate-200 p-1 gap-1">
+                        <div
+                          className={`inline-flex rounded-lg bg-slate-100 border border-slate-200 p-1 gap-1 ${
+                            isWeekend ? 'opacity-50' : ''
+                          }`}
+                        >
                           {Object.entries(STATUS_CONFIG).map(([st, conf]) => {
                             const isActive = currentStatus === st;
                             return (
                               <button
                                 key={st}
                                 onClick={() => handleMark(emp._id, st, emp.name)}
-                                disabled={isSaving}
+                                disabled={isWeekend || isSaving}
                                 className={`px-3 py-1 rounded-md text-xs transition-all ${
-                                  isActive ? conf.btnActive : conf.btnIdle
+                                  isWeekend
+                                    ? 'cursor-not-allowed text-slate-400'
+                                    : isActive
+                                    ? conf.btnActive
+                                    : conf.btnIdle
                                 }`}
-                                title={`Mark as ${st}`}
+                                title={
+                                  isWeekend
+                                    ? 'Attendance cannot be marked on weekends (Saturday / Sunday)'
+                                    : `Mark as ${st}`
+                                }
                               >
                                 {conf.label}
                               </button>

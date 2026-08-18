@@ -44,6 +44,15 @@ exports.markAttendance = async (req, res) => {
       return res.status(400).json({ message: 'Status must be Present, Absent, or On Leave' });
     }
 
+    // Reject weekend marking (Saturday: 6, Sunday: 0)
+    const dateObj = new Date(date + 'T00:00:00');
+    const dayOfWeek = dateObj.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      return res.status(400).json({
+        message: 'Attendance cannot be marked on weekends (Saturday / Sunday).',
+      });
+    }
+
     // Verify employee exists
     const employee = await Employee.findById(employeeId);
     if (!employee) {
@@ -54,7 +63,7 @@ exports.markAttendance = async (req, res) => {
     const attendance = await Attendance.findOneAndUpdate(
       { employeeId, date },
       { status },
-      { returnDocument: 'after', upsert: true, setDefaultsOnInsert: true }
+      { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true }
     ).populate('employeeId', 'name employeeId department designation status');
 
     return res.json(attendance);

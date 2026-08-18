@@ -10,14 +10,14 @@ Designed with the **Stitch Executive Slate** design system (inspired by Linear, 
 
 ---
 
-## 🌐 Live Deployments & Local URLs
+## 🌐 Live Deployments & Demo
 
-| Environment | Frontend URL | Backend REST API |
+| Environment | Link / URL | Description |
 |---|---|---|
-| **Production / Hosted** | [https://pramyan-assignment-hr-dashboard.vercel.app](https://pramyan-assignment-hr-dashboard.vercel.app) | [https://pramyan-assignment.onrender.com](https://pramyan-assignment.onrender.com) |
-| **Local Development** | [http://localhost:3000](http://localhost:3000) | [http://localhost:5001](http://localhost:5001) |
-
-- **Hosted Database**: MongoDB Atlas (`pramyanassignment.igzfs1s.mongodb.net`)
+| **Production App (Vercel)** | [https://pramyan-assignment-hr-dashboard.vercel.app](https://pramyan-assignment-hr-dashboard.vercel.app) | Live Next.js 16 Web Dashboard |
+| **REST API Server (Render)** | [https://pramyan-assignment.onrender.com](https://pramyan-assignment.onrender.com) | Live Node.js / Express API |
+| **Database (Atlas Cloud)** | MongoDB Atlas | 8 Departments, 26 Employees, 500+ Logs |
+| **Video Walkthrough** | [`docs/demo-walkthrough.mov`](./docs/demo-walkthrough.mov) | 1-2 min comprehensive screen recording |
 
 ---
 

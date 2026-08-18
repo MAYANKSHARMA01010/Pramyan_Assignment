@@ -27,6 +27,17 @@ const EMPTY = {
   status: 'Active',
 };
 
+const formatDateForInput = (d) => {
+  if (!d) return '';
+  try {
+    const dateObj = new Date(d);
+    if (isNaN(dateObj.getTime())) return '';
+    return dateObj.toISOString().split('T')[0];
+  } catch {
+    return '';
+  }
+};
+
 export default function EmployeeModal({ isOpen, onClose, onSave, employee }) {
   const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
@@ -43,7 +54,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }) {
           designation: employee.designation ?? '',
           email: employee.email ?? '',
           phone: employee.phone ?? '',
-          dateOfJoining: employee.dateOfJoining ? employee.dateOfJoining.split('T')[0] : '',
+          dateOfJoining: formatDateForInput(employee.dateOfJoining),
           status: employee.status ?? 'Active',
         });
       } else {
@@ -69,11 +80,14 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }) {
     const result = employeeSchema.safeParse(form);
     if (!result.success) {
       const errMap = {};
-      result.error.errors.forEach((err) => {
-        errMap[err.path[0]] = err.message;
+      const issues = result.error?.issues || result.error?.errors || [];
+      issues.forEach((err) => {
+        if (err.path && err.path[0]) {
+          errMap[err.path[0]] = err.message;
+        }
       });
       setFieldErrors(errMap);
-      setError(result.error.errors[0]?.message || 'Please fix validation errors below.');
+      setError(issues[0]?.message || 'Please fix validation errors below.');
       return;
     }
 
@@ -82,11 +96,17 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }) {
       await onSave(result.data);
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save employee record.');
-      if (err.response?.data?.errors) {
+      const backendMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        'Failed to save employee record.';
+      setError(backendMessage);
+      const backendErrors = err.response?.data?.errors;
+      if (Array.isArray(backendErrors)) {
         const backendErrMap = {};
-        err.response.data.errors.forEach((e) => {
-          backendErrMap[e.field] = e.message;
+        backendErrors.forEach((e) => {
+          if (e.field) backendErrMap[e.field] = e.message;
         });
         setFieldErrors(backendErrMap);
       }

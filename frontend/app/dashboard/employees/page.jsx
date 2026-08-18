@@ -29,7 +29,7 @@ const DEPARTMENTS = [
   'Design',
   'Marketing',
   'Sales',
-  'Human Resources',
+  'HR',
   'Finance',
   'Operations',
   'Legal',

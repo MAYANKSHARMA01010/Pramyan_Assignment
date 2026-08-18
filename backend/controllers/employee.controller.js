@@ -57,24 +57,24 @@ exports.createEmployee = async (req, res) => {
     }
 
     // Check unique employeeId and email
-    const existingId = await Employee.findOne({ employeeId });
+    const existingId = await Employee.findOne({ employeeId: employeeId.trim() });
     if (existingId) {
-      return res.status(400).json({ message: `Employee ID ${employeeId} is already in use` });
+      return res.status(400).json({ message: `Employee ID ${employeeId.trim()} is already in use` });
     }
 
-    const existingEmail = await Employee.findOne({ email });
+    const existingEmail = await Employee.findOne({ email: email.trim().toLowerCase() });
     if (existingEmail) {
-      return res.status(400).json({ message: `Email ${email} is already registered` });
+      return res.status(400).json({ message: `Email ${email.trim()} is already registered` });
     }
 
     const employee = await Employee.create({
-      name,
-      employeeId,
-      department,
-      designation,
-      email,
-      phone,
-      dateOfJoining,
+      name: name.trim(),
+      employeeId: employeeId.trim(),
+      department: department.trim(),
+      designation: designation.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      dateOfJoining: new Date(dateOfJoining),
       status: status || 'Active',
     });
 
@@ -96,34 +96,40 @@ exports.updateEmployee = async (req, res) => {
     }
 
     // Check duplicate ID if changed
-    if (employeeId && employeeId !== employee.employeeId) {
-      const duplicateId = await Employee.findOne({ employeeId });
+    if (employeeId && employeeId.trim() !== employee.employeeId) {
+      const duplicateId = await Employee.findOne({
+        employeeId: employeeId.trim(),
+        _id: { $ne: req.params.id },
+      });
       if (duplicateId) {
-        return res.status(400).json({ message: `Employee ID ${employeeId} is already in use` });
+        return res.status(400).json({ message: `Employee ID ${employeeId.trim()} is already in use` });
       }
     }
 
     // Check duplicate email if changed
-    if (email && email !== employee.email) {
-      const duplicateEmail = await Employee.findOne({ email });
+    if (email && email.trim().toLowerCase() !== employee.email.toLowerCase()) {
+      const duplicateEmail = await Employee.findOne({
+        email: email.trim().toLowerCase(),
+        _id: { $ne: req.params.id },
+      });
       if (duplicateEmail) {
-        return res.status(400).json({ message: `Email ${email} is already in use` });
+        return res.status(400).json({ message: `Email ${email.trim()} is already in use` });
       }
     }
 
     const updated = await Employee.findByIdAndUpdate(
       req.params.id,
       {
-        name: name ?? employee.name,
-        employeeId: employeeId ?? employee.employeeId,
-        department: department ?? employee.department,
-        designation: designation ?? employee.designation,
-        email: email ?? employee.email,
-        phone: phone ?? employee.phone,
-        dateOfJoining: dateOfJoining ?? employee.dateOfJoining,
-        status: status ?? employee.status,
+        name: name !== undefined ? name.trim() : employee.name,
+        employeeId: employeeId !== undefined ? employeeId.trim() : employee.employeeId,
+        department: department !== undefined ? department.trim() : employee.department,
+        designation: designation !== undefined ? designation.trim() : employee.designation,
+        email: email !== undefined ? email.trim().toLowerCase() : employee.email,
+        phone: phone !== undefined ? phone.trim() : employee.phone,
+        dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : employee.dateOfJoining,
+        status: status !== undefined ? status : employee.status,
       },
-      { returnDocument: 'after', runValidators: true }
+      { new: true, runValidators: true }
     );
 
     return res.json(updated);

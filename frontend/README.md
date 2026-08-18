@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pramyan HR Management — Frontend Web Application
 
-## Getting Started
+The frontend client for the Pramyan HR Management System, built with **Next.js 16 (App Router)**, **React 19**, and **Tailwind CSS v4**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🛠️ Technology Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **UI Library**: React 19 (`react`, `react-dom`)
+- **State Management**: React 19 Context API + `useReducer` (`AuthContext`, `DashboardContext`)
+- **Styling**: Tailwind CSS v4 (PostCSS)
+- **Validation**: Zod client-side form validation schemas
+- **HTTP Client**: Axios with automatic 401 token refresh queue & cookie credentials
+- **Visuals & Charts**: Recharts & Lucide React Icons
+
+---
+
+## 📁 File Structure
+
+```
+frontend/
+├── app/
+│   ├── dashboard/
+│   │   ├── attendance/
+│   │   │   └── page.jsx       # Daily roll call, date picker & history drawer
+│   │   ├── employees/
+│   │   │   └── page.jsx       # Employee directory table, filters & CSV export
+│   │   ├── layout.jsx         # Dashboard shell (Sidebar + Topbar wrapper)
+│   │   └── page.jsx           # Executive overview & department charts
+│   ├── login/
+│   │   └── page.jsx           # Login screen with 1-click demo autofill
+│   ├── globals.css            # Corporate theme variables & base styles
+│   ├── layout.js              # Root layout & font configurations
+│   ├── page.js                # Root redirection
+│   └── providers.jsx          # Context providers wrapper (Auth + Dashboard)
+├── components/
+│   ├── EmployeeModal.jsx      # Add / Edit Employee modal with Zod validation
+│   ├── Sidebar.jsx            # Fixed navigation rail
+│   ├── StatCard.jsx           # Executive metric cards
+│   └── Topbar.jsx             # System status & user profile banner
+├── context/
+│   ├── AuthContext.jsx        # Authentication session management
+│   └── DashboardContext.jsx   # Global workforce state & roster actions
+├── reducers/
+│   ├── authReducer.js         # Auth state actions & transitions
+│   └── dashboardReducer.js    # Dashboard data actions & transitions
+├── lib/
+│   ├── api.js                 # Axios instance with 401 refresh token interceptor
+│   └── validations.js         # Zod schemas for forms
+├── next.config.mjs            # Next.js config with /api/* proxy rewrites
+├── proxy.js                   # Edge route guard checking dual-token cookies
+├── jsconfig.json              # Path aliases configuration (@/*)
+├── package.json
+├── .env                       # Local environment variables
+└── .env.example               # Environment variables template
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Environment Variables (`frontend/.env`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```ini
+# Environment Mode: development | production
+NODE_ENV=development
+NEXT_PUBLIC_NODE_ENV=development
 
-## Learn More
+# Frontend Port
+PORT=3000
 
-To learn more about Next.js, take a look at the following resources:
+# Application URLs (Local & Hosted)
+NEXT_PUBLIC_LOCAL_FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_HOSTED_FRONTEND_URL=https://pramyan-assignment-hr-dashboard.vercel.app
+NEXT_PUBLIC_LOCAL_BACKEND_URL=http://localhost:5001
+NEXT_PUBLIC_HOSTED_BACKEND_URL=https://pramyan-assignment.onrender.com
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Active Backend API URL
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5001
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Development Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+From the repository root or inside the `frontend` directory:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Start frontend development server
+pnpm --filter frontend dev
+
+# Build production bundle
+pnpm --filter frontend build
+
+# Start production server
+pnpm --filter frontend start
+
+# Run ESLint check
+pnpm --filter frontend lint
+```

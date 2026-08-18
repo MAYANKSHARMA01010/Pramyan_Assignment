@@ -423,51 +423,95 @@ export default function AttendancePage() {
       )}
 
       {/* Summary Metrics Banner */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="card-saas p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 font-mono-code font-bold">
-            {presentCount}
+      {isWeekend ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 font-mono-code font-bold text-base">
+              🏖️
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Day Type</p>
+              <p className="text-sm font-bold text-amber-800 font-mono-code">Weekend ({shortDayName})</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Present</p>
-            <p className="text-sm font-bold text-slate-900 font-mono-code">
-              {presentRate}% of logged
-            </p>
-          </div>
-        </div>
 
-        <div className="card-saas p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 font-mono-code font-bold">
-            {leaveCount}
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-mono-code font-bold text-xs">
+              OFF
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Schedule</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">Non-Working Day</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">On Leave</p>
-            <p className="text-sm font-bold text-slate-900 font-mono-code">Approved PTO</p>
-          </div>
-        </div>
 
-        <div className="card-saas p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0 font-mono-code font-bold">
-            {absentCount}
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-mono-code font-bold">
+              {totalEmployees}
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Roster</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">{totalEmployees} Active Staff</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Absent</p>
-            <p className="text-sm font-bold text-slate-900 font-mono-code">Unplanned</p>
-          </div>
-        </div>
 
-        <div className="card-saas p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-mono-code font-bold">
-            {completionRate}%
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Logged</p>
-            <p className="text-sm font-bold text-slate-900 font-mono-code">
-              {markedCount}/{totalEmployees} Staff
-            </p>
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 font-mono-code font-bold text-xs">
+              —
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Roll Call</p>
+              <p className="text-sm font-bold text-slate-600 font-mono-code">Not Required</p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 font-mono-code font-bold">
+              {presentCount}
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Present</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">
+                {presentRate}% of logged
+              </p>
+            </div>
+          </div>
+
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 font-mono-code font-bold">
+              {leaveCount}
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">On Leave</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">Approved PTO</p>
+            </div>
+          </div>
+
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0 font-mono-code font-bold">
+              {absentCount}
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Absent</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">Unplanned</p>
+            </div>
+          </div>
+
+          <div className="card-saas p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-mono-code font-bold">
+              {completionRate}%
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Logged</p>
+              <p className="text-sm font-bold text-slate-900 font-mono-code">
+                {markedCount}/{totalEmployees} Staff
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Full-Width Staff Roll Call Table */}
       <div className="card-saas overflow-hidden">
@@ -540,7 +584,14 @@ export default function AttendancePage() {
 
                       {/* Status Pill */}
                       <td className="px-4 py-3.5">
-                        <StatusPill status={currentStatus} />
+                        {isWeekend ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono-code bg-slate-100 text-slate-500 border border-slate-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                            Weekend Off
+                          </span>
+                        ) : (
+                          <StatusPill status={currentStatus} />
+                        )}
                       </td>
 
                       {/* Segmented Quick Status Buttons */}

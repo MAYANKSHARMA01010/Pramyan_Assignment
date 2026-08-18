@@ -35,13 +35,7 @@ export default function Topbar() {
         </div>
 
         <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-
-        {/* Database Status Indicator */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-          <span>Atlas Cloud</span>
-        </div>
-
+        
         {/* Admin Avatar & Profile */}
         <div className="flex items-center gap-2.5 pl-2">
           <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-xs">
